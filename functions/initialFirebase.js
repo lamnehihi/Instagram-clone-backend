@@ -18,6 +18,7 @@ var firebaseConfig = {
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://socialape-fb7db.firebaseio.com",
+  storageBucket: "socialape-fb7db.appspot.com"
 });
 
 firebase.initializeApp(firebaseConfig);
@@ -30,4 +31,4 @@ module.exports.firebase = firebase;
 module.exports.db = db;
 module.exports.admin = admin;
 module.exports.functions = functions;
-
+module.exports.firebaseConfig = firebaseConfig;

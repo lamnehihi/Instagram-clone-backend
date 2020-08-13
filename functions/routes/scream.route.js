@@ -6,6 +6,10 @@ const middlewareAuth = require('../middlewares/FBAuth.middleware');
 
 router.get('/', controller.screams);
 
-router.post('/screamPost', middlewareAuth.FBAuth, controller.screamPost);
+router.post(
+  '/screamPost',
+  middlewareAuth.FBAuth, 
+  controller.screamPost
+);
  
 module.exports = router;

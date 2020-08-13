@@ -1,5 +1,6 @@
-const { firebase, db } = require('../initialFirebase');
-const { isEmptyString, isEmail } = require('../validates/inputField.validate');
+const { firebase, db, firebaseConfig } = require("../initialFirebase");
+const { isEmptyString, isEmail } = require("../validates/inputField.validate");
+const { validateSignInData, validateLogInData } = require("../validates/auth.validate");
 
 module.exports.login = function (req, res) {
   const user = {
@@ -7,11 +8,7 @@ module.exports.login = function (req, res) {
     password: req.body.password,
   };
 
-  let errors = {};
-  if (isEmptyString(user.email)) errors.email = "email is require!";
-  if (!isEmail(user.email)) errors.email = "invalid email!";
-  if (isEmptyString(user.password)) errors.password = "password is require!";
-
+  let errors = validateLogInData(user);
   if (Object.keys(errors).length > 0) return res.status(400).json(errors);
 
   firebase
@@ -40,29 +37,14 @@ module.exports.signin = function (req, res) {
     confirmPassword: req.body.confirmPassword,
     handle: req.body.handle,
   };
+  const defaultImg = 'no-img.png';
 
-  let errors = {};
-
-  if (isEmptyString(newUser.email)) {
-    errors.email = "email is required!";
-  } else if (!isEmail(newUser.email)) {
-    errors.email = "invalid email!";
-  }
-
-  if (isEmptyString(newUser.password)) {
-    errors.password = "password is required!";
-  }
-  if (newUser.password !== newUser.confirmPassword) {
-    errors.password = "password must match!";
-  }
-  if (isEmptyString(newUser.handle)) {
-    errors.handle = "handle is required!";
-  }
+  let errors = validateSignInData(newUser);
   if (Object.keys(errors).length > 0) {
     return res.status(400).json(errors);
   }
 
-  //NOTE: validate data
+  //NOTE: validate data 
   let token, userId;
   db.doc(`/users/${newUser.handle}`)
     .get()
@@ -86,6 +68,7 @@ module.exports.signin = function (req, res) {
         handle: newUser.handle,
         email: newUser.email,
         createdAt: new Date().toISOString(),
+        imageUrl: `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${defaultImg}?alt=media`,
         userId,
       };
       return db.doc(`/users/${newUser.handle}`).set(userCredentials);
