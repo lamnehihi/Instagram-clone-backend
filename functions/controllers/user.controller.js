@@ -69,6 +69,26 @@ module.exports.updateUserDetails = (req, res) => {
     })
 }
 
+module.exports.getUser = (req, res) => {
+  const userDetails = {};
+
+  db.doc(`users/${req.user.handle}`).get()
+    .then(doc => {
+      userDetails.credentials = doc.data();
+      return db.collection('likes').where('handle', '==', doc.data().handle).get()
+    })
+    .then(data => {
+      userDetails.likes = [];
+      data.forEach(doc => {
+        userDetails.likes.push(doc.data());
+      })
+      return res.json({ message: userDetails });
+    })
+    .catch(err => {
+      res.status(500).json({ error: err.code });
+    })
+}
+
  
 
 

@@ -10,8 +10,13 @@ router.post(
 );
 
 router.post(
-  '/updateUserDetails', 
+  '/', 
   controller.updateUserDetails
+);
+
+router.get(
+  '/', 
+  controller.getUser
 );
 
 module.exports = router;
