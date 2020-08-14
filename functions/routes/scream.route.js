@@ -11,5 +11,16 @@ router.post(
   middlewareAuth.FBAuth, 
   controller.screamPost
 );
+
+router.get(
+  '/:screamId', 
+  controller.getScream
+);
+
+router.post(
+  '/:screamId/comment', 
+  middlewareAuth.FBAuth, 
+  controller.commentPost
+);
  
 module.exports = router;
