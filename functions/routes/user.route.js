@@ -2,12 +2,16 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("../controllers/user.controller");
-const middlewareAuth = require("../middlewares/FBAuth.middleware");
+const middlewareAuth = require("../middlewares/userAuth.middleware");
 
 router.post(
-  '/uploadImg',
-  middlewareAuth.FBAuth, 
-  controller.uploadImg
+  '/uploadImg', 
+  controller.uploadAvatar
+);
+
+router.post(
+  '/updateUserDetails', 
+  controller.updateUserDetails
 );
 
 module.exports = router;

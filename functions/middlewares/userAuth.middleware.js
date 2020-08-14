@@ -1,4 +1,5 @@
 const { admin, db } = require("../initialFirebase");
+const { isEmptyString } = require("../validates/inputField.validate");
 
 module.exports.FBAuth = (req, res, next) => {
   let idToken;
@@ -17,7 +18,6 @@ module.exports.FBAuth = (req, res, next) => {
     .verifyIdToken(idToken)
     .then((decodeToken) => {
       req.user = decodeToken;
-      console.log("decodedToken: ", decodeToken);
       return db
         .collection("users")
         .where("userId", "==", req.user.uid)
@@ -33,3 +33,17 @@ module.exports.FBAuth = (req, res, next) => {
       return res.status(403).json(err);
     });
 };
+
+// ANCHOR: update user details
+module.exports.reducerUserDetails = (data) => {
+  const userDetails = {};
+
+  if(!isEmptyString(data.bio.trim())) userDetails.bio = data.bio;
+  if(!isEmptyString(data.website.trim())) {
+    if(data.website.substring(0,4) !== 'http') {
+      userDetails.website = `http://${data.website}`;
+    } else userDetails.website = data.website;
+  }
+  if(!isEmptyString(data.location.trim())) userDetails.location = data.location;
+  return userDetails;
+}

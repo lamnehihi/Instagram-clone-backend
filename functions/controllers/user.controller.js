@@ -1,7 +1,8 @@
 const { admin, firebaseConfig, db } = require("../initialFirebase");
+const { reducerUserDetails } = require("../middlewares/userAuth.middleware");
 
-// ANCHOR: upload userImg
-module.exports.uploadImg = function (req, res) {
+// ANCHOR: upload user avatar
+module.exports.uploadAvatar = function (req, res) {
   const user = req.user;
   const Busboy = require("busboy");
 
@@ -55,3 +56,32 @@ module.exports.uploadImg = function (req, res) {
   });
   busboy.end(req.rawBody);
 };
+
+module.exports.updateUserDetails = (req, res) => {
+  const userDetails = reducerUserDetails(req.body);
+
+  db.doc(`users/${req.user.handle}`).update({ ...userDetails })
+    .then(() => {
+      return res.json({ message: 'update user details successfully'});
+    })
+    .catch(err => {
+      res.status(500).json({ error: err.code });
+    })
+}
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
