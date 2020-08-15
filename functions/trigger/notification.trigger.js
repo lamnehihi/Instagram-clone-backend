@@ -1,7 +1,7 @@
 const { functions, db } = require("../initialFirebase");
 
 // ANCHOR: create notification on like
-exports.createNotificationOnLike = functions
+module.exports.createNotificationOnLikee = functions
   .region("asia-east2")
   .firestore.document("likes/{id}")
   .onCreate(async (snapshot) => {
@@ -25,7 +25,7 @@ exports.createNotificationOnLike = functions
   });
 
 // ANCHOR: delete notification on unlike
-exports.deleteNotificationOnUnlike = functions
+module.exports.deleteNotificationOnUnlikee = functions
   .region("asia-east2")
   .firestore.document("likes/{id}")
   .onDelete(async (snapshot) => {
@@ -39,7 +39,7 @@ exports.deleteNotificationOnUnlike = functions
   });
 
 // ANCHOR: create notification on comment
-exports.createNotificationOnComment = functions
+module.exports.createNotificationOnCommentt = functions
   .region("asia-east2")
   .firestore.document("comments/{id}")
   .onCreate(async (snapshot) => {

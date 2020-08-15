@@ -11,8 +11,13 @@ const middlewareUserAuth = require("./middlewares/userAuth.middleware");
 
 app.use("/scream", screamRoute);
 app.use("/auth", authRoute);
-app.use("/user", middlewareUserAuth.FBAuth, userRoute);
+app.use("/user", userRoute);
 
-//trigger
+//trigger notifications
+const {createNotificationOnLikee, deleteNotificationOnUnlikee, createNotificationOnCommentt} =  require('./trigger/notification.trigger');
+
+exports.createNotificationOnLike = createNotificationOnLikee;
+exports.deleteNotificationOnUnlike = deleteNotificationOnUnlikee;
+exports.createNotificationOnComment = createNotificationOnCommentt;
 
 exports.api = functions.region("asia-east2").https.onRequest(app);
