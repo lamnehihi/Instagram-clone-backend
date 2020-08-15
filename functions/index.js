@@ -13,4 +13,6 @@ app.use("/scream", screamRoute);
 app.use("/auth", authRoute);
 app.use("/user", middlewareUserAuth.FBAuth, userRoute);
 
+//trigger
+
 exports.api = functions.region("asia-east2").https.onRequest(app);

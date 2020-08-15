@@ -48,3 +48,4 @@ module.exports.reducerUserDetails = (data) => {
   if(!isEmptyString(data.location.trim())) userDetails.location = data.location;
   return userDetails;
 }
+
