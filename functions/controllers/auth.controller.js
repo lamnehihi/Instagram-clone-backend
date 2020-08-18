@@ -21,16 +21,13 @@ module.exports.login = async (req, res) => {
     const token = await data.user.getIdToken();
     return res.json({ token });
   } catch (err) {
-    if (err.code === "auth/wrong-password") {
       return res
         .status(400)
         .json({ general: "wrong email or password, please try again" });
-    }
-    return res.status(500).json({ error: err.code });
   }
 };
 
-module.exports.signin = async (req, res) => {
+module.exports.signup = async (req, res) => {
   const newUser = {
     email: req.body.email,
     password: req.body.password,
@@ -72,6 +69,6 @@ module.exports.signin = async (req, res) => {
     if (err.code === "auth/email-already-in-use") {
       return res.status(400).json({ error: "Email already in use" });
     }
-    res.status(500).json({ error: err.code });
+    res.status(500).json({ general: 'something when wrong, please try again'});
   }
 };

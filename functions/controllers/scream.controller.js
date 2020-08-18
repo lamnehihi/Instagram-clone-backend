@@ -77,8 +77,9 @@ module.exports.getScream = async (req, res) => {
 
 // ANCHOR: add comment on a scream
 module.exports.commentPost = async (req, res) => {
-  if (req.body.body.trim() === "")
-    return res.status(400).json({ error: "comment must not be empty" });
+  try {
+    if (req.body.body.trim() === "")
+    return res.status(400).json({ comment: "comment must not be empty" });
 
   const newComment = {
     createAt: new Date().toISOString(),
@@ -87,13 +88,15 @@ module.exports.commentPost = async (req, res) => {
     screamId: req.params.screamId,
     userImage: req.user.imageUrl,
   };
-
-  try {
     const doc = await db.doc(`/screams/${req.params.screamId}`).get();
     if (!doc.exists) return res.status(404).json({ error: "scream not found" });
     await db.collection("comments").add(newComment);
+    await db
+      .doc(`/screams/${req.params.screamId}`)
+      .update({ commentCount: doc.data().commentCount + 1 });
     return res.json({ newComment });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: `something went wrong` });
   }
 };
@@ -158,10 +161,6 @@ module.exports.like = async (req, res) => {
 module.exports.unlike = async (req, res) => {
   try {
     const scream = req.scream;
-    const willUnlike = {
-      screamId: scream.id,
-      userHandle: req.user.handle,
-    };
 
     const data = await db
       .collection("likes")

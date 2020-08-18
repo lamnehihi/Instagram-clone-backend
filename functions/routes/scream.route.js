@@ -39,7 +39,6 @@ router.post(
   controller.like
 );
 
-//TODO: unlike scream
 router.post(
   '/:screamId/unlike',
   middlewareAuth.FBAuth,
