@@ -7,7 +7,8 @@ const authRoute = require("./routes/auth.route");
 const screamRoute = require("./routes/scream.route");
 const userRoute = require("./routes/user.route");
 
-const middlewareUserAuth = require("./middlewares/userAuth.middleware");
+const cors = require('cors');
+app.use(cors());
 
 app.use("/scream", screamRoute);
 app.use("/auth", authRoute);
@@ -22,4 +23,4 @@ exports.createNotificationOnComment = createNotificationOnCommentt;
 exports.onUserImageChange = onUserImageChangee;
 exports.onScreamDelete = onScreamDeletee;
 
-exports.api = functions.region("asia-east2").https.onRequest(app);
+exports.api = functions.https.onRequest(app);
