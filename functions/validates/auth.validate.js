@@ -26,7 +26,7 @@ module.exports.validateLogInData = (user) => {
   let errors = {};
   
   if (isEmptyString(user.email)) errors.email = "email is require!";
-  if (!isEmail(user.email)) errors.email = "invalid email!";
+  else if (!isEmail(user.email)) errors.email = "invalid email!";
   if (isEmptyString(user.password)) errors.password = "password is require!";
   
   return errors;
