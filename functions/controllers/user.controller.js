@@ -7,6 +7,8 @@ module.exports.getUser = async (req, res) => {
     const userDetails = {};
     const doc = await db.doc(`users/${req.user.handle}`).get();
     userDetails.credentials = doc.data();
+
+    //get user likes
     const dataLikes = await db
       .collection("likes")
       .where("userHandle", "==", doc.data().handle)
@@ -17,6 +19,8 @@ module.exports.getUser = async (req, res) => {
       newLike.id = doc.id;
       userDetails.likes.push(newLike);
     });
+
+    //get user notifications
     const dataNotifications = await db
       .collection("notifications")
       .where("recipient", "==", doc.data().handle)
@@ -28,6 +32,19 @@ module.exports.getUser = async (req, res) => {
       let newNoti = doc.data();
       newNoti.id = doc.id;
       userDetails.notifications.push(newNoti);
+    });
+
+    //get user screams
+    const dataScreams = await db
+      .collection("screams")
+      .where("userHandle", "==", doc.data().handle)
+      .orderBy("createAt", "desc")
+      .get();
+    userDetails.screams = [];
+    dataScreams.forEach((doc) => {
+      let scream = doc.data();
+      scream.id = doc.id;
+      userDetails.screams.push(scream);
     });
     return res.json(userDetails);
   } catch (error) {
