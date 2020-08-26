@@ -10,8 +10,10 @@ module.exports.screams = async (req, res) => {
       .get();
     let screams = [];
     data.forEach((doc) => {
+      const screamId = doc.id;
       screams.push({
         ...doc.data(),
+        screamId
       });
     });
     return res.json(screams);
@@ -79,15 +81,15 @@ module.exports.getScream = async (req, res) => {
 module.exports.commentPost = async (req, res) => {
   try {
     if (req.body.body.trim() === "")
-    return res.status(400).json({ comment: "comment must not be empty" });
+      return res.status(400).json({ comment: "comment must not be empty" });
 
-  const newComment = {
-    createAt: new Date().toISOString(),
-    body: req.body.body,
-    userHandle: req.user.handle,
-    screamId: req.params.screamId,
-    userImage: req.user.imageUrl,
-  };
+    const newComment = {
+      createAt: new Date().toISOString(),
+      body: req.body.body,
+      userHandle: req.user.handle,
+      screamId: req.params.screamId,
+      userImage: req.user.imageUrl,
+    };
     const doc = await db.doc(`/screams/${req.params.screamId}`).get();
     if (!doc.exists) return res.status(404).json({ error: "scream not found" });
     await db.collection("comments").add(newComment);
@@ -140,7 +142,7 @@ module.exports.like = async (req, res) => {
           return item;
       });
       console.log("like found", likeFound);
-      if(likeFound === undefined) likeFound = {};
+      if (likeFound === undefined) likeFound = {};
       console.log("like found", likeFound);
       if (Object.keys(likeFound).length > 0) {
         return res.status(400).json({ error: "already liked on this scream" });
@@ -149,7 +151,7 @@ module.exports.like = async (req, res) => {
     const response = await db.collection("likes").add(newLike);
     await db
       .doc(`/screams/${req.params.screamId}`)
-      .update({ likeCount: req.scream.likeCount += 1 });
+      .update({ likeCount: (req.scream.likeCount += 1) });
     return res.json(req.scream);
   } catch (error) {
     console.log(error);
@@ -178,13 +180,13 @@ module.exports.unlike = async (req, res) => {
       if (item.userHandle === req.user.handle && item.screamId === scream.id)
         return item;
     });
-    if(likeFound === undefined) likeFound = {};
-    
+    if (likeFound === undefined) likeFound = {};
+
     if (Object.keys(likeFound).length > 0) {
       const response = await db.collection("likes").doc(likeFound.id).delete();
       await db
         .doc(`/screams/${req.params.screamId}`)
-        .update({ likeCount: scream.likeCount -= 1 });
+        .update({ likeCount: (scream.likeCount -= 1) });
       return res.json(scream);
     } else {
       return res.status(400).json({ error: "you havn't like on this scream" });

@@ -23,4 +23,4 @@ exports.createNotificationOnComment = createNotificationOnCommentt;
 exports.onUserImageChange = onUserImageChangee;
 exports.onScreamDelete = onScreamDeletee;
 
-exports.api = functions.https.onRequest(app);
+exports.api = functions.region('asia-east2').https.onRequest(app);
