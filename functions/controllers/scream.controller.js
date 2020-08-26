@@ -1,4 +1,4 @@
-const { firebase, db } = require("../initialFirebase");
+const { firebase, db, admin, firebaseConfig } = require("../initialFirebase");
 const { isEmptyString } = require("../validates/inputField.validate");
 
 // ANCHOR: get all scream
@@ -13,7 +13,7 @@ module.exports.screams = async (req, res) => {
       const screamId = doc.id;
       screams.push({
         ...doc.data(),
-        screamId
+        screamId,
       });
     });
     return res.json(screams);
@@ -25,11 +25,9 @@ module.exports.screams = async (req, res) => {
 
 // ANCHOR: post new scream
 module.exports.screamPost = async (req, res) => {
-  if (isEmptyString(req.body.body))
-    return res.status(400).json({ error: "scream must not be empty" });
-
+  //handle image
+  const Busboy = require("busboy");
   const newScream = {
-    body: req.body.body,
     userHandle: req.user.handle,
     userImage: req.user.imageUrl,
     createAt: new Date().toISOString(),
@@ -37,15 +35,82 @@ module.exports.screamPost = async (req, res) => {
     commentCount: 0,
   };
 
-  try {
-    const doc = await db.collection("screams").add(newScream);
-    const resScream = { ...newScream };
-    resScream.id = doc.id;
-    return res.json(resScream);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "something went wrong" });
-  }
+  const http = require("http"),
+    path = require("path"),
+    os = require("os"),
+    inspect = require("util").inspect,
+    fs = require("fs");
+  const busboy = new Busboy({ headers: req.headers });
+  let imageToBeUploaded;
+  let imageFileName;
+  busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+    const type = mimetype.split("/")[0];
+    if (type !== "image") {
+      return res.status(400).json({ error: "Wrong file type submitted" });
+    }
+
+    //lamnehihi.as.png
+    const imageExtension = filename.split(".").slice(-1).pop();
+    imageFileName = `${newScream.createAt}_${Math.trunc(
+      Math.random() * 10000000000
+    )}.${imageExtension}`;
+
+    const filePath = path.join(os.tmpdir(), imageFileName);
+    imageToBeUploaded = { filePath, mimetype };
+    file.pipe(fs.createWriteStream(filePath));
+  });
+  busboy.on("field", function (
+    fieldname,
+    val,
+    fieldnameTruncated,
+    valTruncated,
+    encoding,
+    mimetype
+  ) {
+    console.log("fieldname", fieldname);
+    console.log("body scream", val);
+    if (isEmptyString(val))
+      return res.status(400).json({ error: "scream must not be empty" });
+    newScream.body = val;
+  });
+  busboy.on("finish", async () => {
+    try {
+      console.log("imageToBeUploaded", imageToBeUploaded);
+      if (imageToBeUploaded) {
+        await admin
+          .storage()
+          .bucket()
+          .upload(imageToBeUploaded.filePath, {
+            resumable: false,
+            metadata: {
+              metadata: {
+                contentType: imageToBeUploaded.mimetype,
+              },
+            },
+          });
+        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${imageFileName}?alt=media`;
+        console.log("new Scream", newScream);
+        newScream.imageUrl = imageUrl;
+      }
+      const doc = await db.collection("screams").add(newScream);
+      const resScream = { ...newScream };
+      resScream.id = doc.id;
+      return res.json(resScream);
+    } catch (err) {
+      return res.status(500).json({ error: err.code });
+    }
+  });
+  busboy.end(req.rawBody);
+  req.pipe(busboy);
+  // try {
+  //   const doc = await db.collection("screams").add(newScream);
+  //   const resScream = { ...newScream };
+  //   resScream.id = doc.id;
+  //   return res.json(resScream);
+  // } catch (error) {
+  //   console.error(error);
+  //   return res.status(500).json({ error: "something went wrong" });
+  // }
 };
 
 // ANCHOR: get a scream by id param
