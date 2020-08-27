@@ -94,7 +94,7 @@ module.exports.screamPost = async (req, res) => {
       }
       const doc = await db.collection("screams").add(newScream);
       const resScream = { ...newScream };
-      resScream.id = doc.id;
+      resScream.screamId = doc.id;
       return res.json(resScream);
     } catch (err) {
       return res.status(500).json({ error: err.code });
