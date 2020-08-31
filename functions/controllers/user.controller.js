@@ -120,18 +120,17 @@ module.exports.getVisitUser = async (req, res) => {
   try {
     let user = {};
     const doc = await db.doc(`users/${req.params.handle}`).get();
-    if(!doc.exists) {
-      return res.status(404).json({error: 'user not found'});
+    if (!doc.exists) {
+      return res.status(404).json({ error: "user not found" });
     }
-    user = doc.data(); 
-    
+    user = doc.data();
     const data = await db
       .collection("screams")
-      .orderBy('createAt', 'desc')
+      .orderBy("createAt", "desc")
       .where("userHandle", "==", req.params.handle)
       .get();
     user.screams = [];
-    data.forEach(doc => {
+    data.forEach((doc) => {
       const newScream = doc.data();
       newScream.id = doc.id;
       user.screams.push(newScream);
@@ -146,14 +145,14 @@ module.exports.getVisitUser = async (req, res) => {
 module.exports.markNotificationRead = async (req, res) => {
   try {
     let batch = db.batch();
-  req.body.forEach(notificationId => {
-    const notification = db.doc(`notifications/${notificationId}`);
-    batch.update(notification, {read : true});
-  });
-  await batch.commit()
-  return res.json({message: 'Notifications marked read'});
+    req.body.forEach((notificationId) => {
+      const notification = db.doc(`notifications/${notificationId}`);
+      batch.update(notification, { read: true });
+    });
+    await batch.commit();
+    return res.json({ message: "Notifications marked read" });
   } catch (error) {
     console.log(error);
     return res.status(500).json(error);
   }
-}
+};

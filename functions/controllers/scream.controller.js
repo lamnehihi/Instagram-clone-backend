@@ -190,6 +190,7 @@ module.exports.like = async (req, res) => {
     const newLike = {
       screamId: scream.id,
       userHandle: req.user.handle,
+      userImage: req.user.imageUrl,
     };
 
     const data = await db
