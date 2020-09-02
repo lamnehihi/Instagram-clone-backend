@@ -25,9 +25,9 @@ module.exports.FBAuth = (req, res, next) => {
         .get();
     })
     .then((data) => {
-      if(!data.docs[0]) {
+      if (!data.docs[0]) {
         console.log("user data not found");
-        return res.status(403).json({user: "user data not found!"});
+        return res.status(403).json({ user: "user data not found!" });
       }
       req.user.handle = data.docs[0].data().handle;
       req.user.imageUrl = data.docs[0].data().imageUrl;
@@ -43,13 +43,31 @@ module.exports.FBAuth = (req, res, next) => {
 module.exports.reducerUserDetails = (data) => {
   const userDetails = {};
 
-  if(!isEmptyString(data.bio.trim())) userDetails.bio = data.bio;
-  if(!isEmptyString(data.website.trim())) {
-    if(data.website.substring(0,4) !== 'http') {
-      userDetails.website = `http://${data.website}`;
-    } else userDetails.website = data.website;
+  if (data.bio) {
+    if (!isEmptyString(data.bio.trim())) {
+      userDetails.bio = data.bio;
+    } else {
+      userDetails.bio = "";
+    }
   }
-  if(!isEmptyString(data.location.trim())) userDetails.location = data.location;
-  return userDetails;
-}
 
+  if (data.website) {
+    if (!isEmptyString(data.website.trim())) {
+      if (data.website.substring(0, 4) !== "http") {
+        userDetails.website = `http://${data.website}`;
+      } else userDetails.website = data.website;
+    } else {
+      userDetails.website = "";
+    }
+  }
+
+  if (data.location) {
+    if (!isEmptyString(data.location.trim())) {
+      userDetails.location = data.location;
+    } else {
+      userDetails.location = "";
+    }
+  }
+
+  return userDetails;
+};

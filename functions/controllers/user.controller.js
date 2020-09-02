@@ -55,11 +55,15 @@ module.exports.getUser = async (req, res) => {
 // ANCHOR: update user details
 module.exports.updateUserDetails = async (req, res) => {
   try {
+    console.log("user body", req.body);
     const userDetails = reducerUserDetails(req.body);
-    await db.doc(`users/${req.user.handle}`).update({ ...userDetails });
+    console.log("userDetails", userDetails);
+    await db.doc(`users/${req.body.handle}`).update({ ...userDetails });
     return res.json({ message: "update user details successfully" });
-  } catch (error) {
-    return res.status(500).json({ error: err.code });
+  } catch (err) {
+    console.log("update fail", req.body);
+
+    return res.status(500).json(err);
   }
 };
 
