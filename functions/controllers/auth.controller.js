@@ -113,3 +113,13 @@ module.exports.signupOAuth = async (req, res) => {
     res.status(500).json({ general: 'something when wrong, please try again'});
   }
 };
+
+
+module.exports.checkOAuth = async (req, res) => {
+  try {
+    return res.status(200).json({checkOAuth: true});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ general: 'something when wrong, please try again'});
+  }
+};
