@@ -7,4 +7,6 @@ router.post('/login', controller.login);
 
 router.post('/signup', controller.signup);
 
+router.post('/signupoauth', controller.signupOAuth);
+
 module.exports = router;

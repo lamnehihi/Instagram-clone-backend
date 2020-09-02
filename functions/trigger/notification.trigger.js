@@ -49,6 +49,7 @@ module.exports.createNotificationOnCommentt = functions
           sender: snapshot.data().userHandle,
           senderImage: snapshot.data().userImage,
           type: "comments",
+          body: snapshot.data().body,
           read: false,
           screamId: doc.id,
         });
